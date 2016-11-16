@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Event</title>
+	<style>
+		body{margin:0;padding:100px;font-size:25px;}
+		div{position:relative;}
+		#out{width:100px;height:100px;padding:100px;background:#2c17ff;}
+		#out:before{position:absolute;top:0;left:0;display:inline;color:#fff;content:'div#out';}
+		#in{width:100px;height:100px;background:#ff5b4e;}
+		#in:before{position:absolute;top:0;left:0;display:inline;color:#fff;content:'div#in';}
+		ul{display:inline-block;width:200px}
+	</style>
+</head>
+<body id="body">
+	<div id="out">
+		<div id="in"></div>
+	</div>
+	
+	<p>target: <span id="target"></span></p>
+	<ul>
+	<li>X: <span id="x"></span></li>
+	<li>clientX: <span id="cx"></span></li>
+	<li>offsetX: <span id="ox"></span></li>
+	<li>pageX: <span id="px"></span></li>
+	<li>screenX: <span id="sx"></span></li>
+	<li>layerX: <span id="lx"></span></li>
+	</ul>
+	<ul>
+	<li>Y: <span id="y"></span></li>
+	<li>clientY: <span id="cy"></span></li>
+	<li>offsetY: <span id="oy"></span></li>
+	<li>pageY: <span id="py"></span></li>
+	<li>screenY: <span id="sy"></span></li>
+	<li>layerY: <span id="ly"></span></li>
+	</ul>
+
+<script>
+	var target = document.getElementById('target'),
+		x = document.getElementById('x'),
+		y = document.getElementById('y'),
+		cx = document.getElementById('cx'),
+		cy = document.getElementById('cy'),
+		ox = document.getElementById('ox'),
+		oy = document.getElementById('oy'),
+		px = document.getElementById('px'),
+		py = document.getElementById('py'),
+		sx = document.getElementById('sx'),
+		sy = document.getElementById('sy'),
+		lx = document.getElementById('lx'),
+		ly = document.getElementById('ly');
+	
+	document.body.onmousemove = function(e){
+		target.innerText = e.target.id;
+		x.innerText = e.x;
+		y.innerText = e.y;
+		cx.innerText = e.clientX;
+		cy.innerText = e.clientY;
+		ox.innerText = e.offsetX;
+		oy.innerText = e.offsetY;
+		px.innerText = e.pageX;
+		py.innerText = e.pageY;
+		sx.innerText = e.screenX;
+		sy.innerText = e.screenY;
+		lx.innerText = e.layerX;
+		ly.innerText = e.layerY;
+	}	
+</script>
+</body>
+</html>
