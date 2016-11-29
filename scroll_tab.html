@@ -7,7 +7,42 @@
 		body {
 			margin: 0;
 		}
-		.section-wrapper {
+		nav {
+			position: fixed;
+			top: 50%;
+			left: 50px;
+			margin-top: -200px;
+		}
+		nav a {
+			transition: 1s ease;
+			position: relative;
+			overflow: hidden;
+			display: block;
+			width: 100px;
+			height: 100px;
+			text-align: center;
+		}
+		nav a:after {
+			position: absolute;
+			top: 0;
+			right: 0;
+			bottom: 0;
+			left: 0;
+			display: block;
+			background: #fff;
+			opacity: 0.4;
+			content: '';
+		}
+		nav a.is-active {
+			z-index: 1;
+			transform: scale(1.1);
+		}
+		nav a.is-active:after {
+			opacity: 0;
+		}
+		nav img {
+			margin: 0 -50%;
+			height: 100%;
 		}
 		.section {
 			height: 100vh;
@@ -30,17 +65,23 @@
 	</style>
 </head>
 <body>
-<main class="section-wrapper">
-	<section class="section section-1">
+<nav>
+	<a href="#section-1" class="is-active"><img src="images/background-image-01.jpeg" alt="1번 섹션 이동"></a>
+	<a href="#section-2"><img src="images/background-image-02.jpeg" alt="2번 섹션 이동"></a>
+	<a href="#section-3"><img src="images/background-image-03.jpeg" alt="3번 섹션 이동"></a>
+	<a href="#section-4"><img src="images/background-image-04.jpeg" alt="4번 섹션 이동"></a>
+</nav>
+<main>
+	<section id="section-1" class="section section-1">
 		
 	</section>
-	<section class="section section-2">
+	<section id="section-2" class="section section-2">
 		
 	</section>
-	<section class="section section-3">
+	<section id="section-3" class="section section-3">
 		
 	</section>
-	<section class="section section-4">
+	<section id="section-4" class="section section-4">
 		
 	</section>
 </main>
@@ -48,12 +89,15 @@
 
 
 <script>
-'use strict';	
+'use strict';
 
-var section = document.querySelector('.section-2');
+// 이벤트 발생시(탭 메뉴 클릭 / 페이지 스크롤의 특정 범위에 진입했을 시):
+// 함수1. 탭 활성화(타겟 인덱스)
+// 함수2. 섹션 활성화(타겟 인덱스)
+
 
 document.addEventListener('scroll', function(e){
-	console.log(section);
+
 });
 
 </script>
