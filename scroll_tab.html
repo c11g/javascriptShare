@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<meta charset="UTF-8">
+	<title>scroll tab</title>
+	<style>
+		body {
+			margin: 0;
+		}
+		.section-wrapper {
+		}
+		.section {
+			height: 100vh;
+			background-size: cover;
+			background-attachment: fixed;
+		}
+		.section-1 {
+			background-image: url('images/background-image-01.jpeg');
+		}
+		.section-2 {
+			background-image: url('images/background-image-02.jpeg');
+		}
+		.section-3 {
+			background-image: url('images/background-image-03.jpeg');
+		}
+		.section-4 {
+			background-image: url('images/background-image-04.jpeg');
+		}
+
+	</style>
+</head>
+<body>
+<main class="section-wrapper">
+	<section class="section section-1">
+		
+	</section>
+	<section class="section section-2">
+		
+	</section>
+	<section class="section section-3">
+		
+	</section>
+	<section class="section section-4">
+		
+	</section>
+</main>
+
+
+
+<script>
+'use strict';	
+
+var section = document.querySelector('.section-2');
+
+document.addEventListener('scroll', function(e){
+	console.log(section);
+});
+
+</script>
+</body>
+</html>
