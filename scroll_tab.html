@@ -4,64 +4,18 @@
 	<meta charset="UTF-8">
 	<title>scroll tab</title>
 	<style>
-		body {
-			margin: 0;
-		}
-		nav {
-			position: fixed;
-			top: 50%;
-			left: 50px;
-			margin-top: -200px;
-		}
-		nav a {
-			transition: 1s ease;
-			position: relative;
-			overflow: hidden;
-			display: block;
-			width: 100px;
-			height: 100px;
-			text-align: center;
-		}
-		nav a:after {
-			position: absolute;
-			top: 0;
-			right: 0;
-			bottom: 0;
-			left: 0;
-			display: block;
-			background: #fff;
-			opacity: 0.4;
-			content: '';
-		}
-		nav a.is-active {
-			z-index: 1;
-			transform: scale(1.1);
-		}
-		nav a.is-active:after {
-			opacity: 0;
-		}
-		nav img {
-			margin: 0 -50%;
-			height: 100%;
-		}
-		.section {
-			height: 100vh;
-			background-size: cover;
-			background-attachment: fixed;
-		}
-		.section-1 {
-			background-image: url('images/background-image-01.jpeg');
-		}
-		.section-2 {
-			background-image: url('images/background-image-02.jpeg');
-		}
-		.section-3 {
-			background-image: url('images/background-image-03.jpeg');
-		}
-		.section-4 {
-			background-image: url('images/background-image-04.jpeg');
-		}
-
+		body {margin: 0 }
+		nav {position: fixed; top: 20px; left: 20px }
+		nav a {transition: 2s ease; position: relative; overflow: hidden; display: block; width: 100px; height: 100px; text-align: center }
+		nav a:after {position: absolute; top: 0; right: 0; bottom: 0; left: 0; display: block; background: #fff; opacity: 0.5; content: '' }
+		nav a.is-active {z-index: 1; transform: scale(1.3) }
+		nav a.is-active:after { opacity: 0 }
+		nav img { margin: 0 -50%; height: 100% }
+		.section { height: 100vh; background-size: cover }
+		.section-1 { background-image: url('images/background-image-01.jpeg') }
+		.section-2 { background-image: url('images/background-image-02.jpeg') }
+		.section-3 { background-image: url('images/background-image-03.jpeg') }
+		.section-4 { background-image: url('images/background-image-04.jpeg') }
 	</style>
 </head>
 <body>
@@ -72,34 +26,56 @@
 	<a href="#section-4"><img src="images/background-image-04.jpeg" alt="4번 섹션 이동"></a>
 </nav>
 <main>
-	<section id="section-1" class="section section-1">
-		
-	</section>
-	<section id="section-2" class="section section-2">
-		
-	</section>
-	<section id="section-3" class="section section-3">
-		
-	</section>
-	<section id="section-4" class="section section-4">
-		
-	</section>
+	<section class="section section-1"></section>
+	<section class="section section-2"></section>
+	<section class="section section-3"></section>
+	<section class="section section-4"></section>
 </main>
 
-
-
+<script src="libs/jquery-3.1.1.min.js"></script>
 <script>
 'use strict';
+function getIndex(target){
+	var _index;
+	_index = ( target.nodeType === 1 )
+			? $(target).index()
+			: Math.round($window.scrollTop() / viewportHeight);
+	return _index;
+}
+function activeTab(index){
+	var isActive = $tabs.eq(index).hasClass('is-active');
+	if ( !isActive ) {
+		$tabs.eq(index).addClass('is-active').siblings().removeClass('is-active');
+	}
+}
+function activeSection(index){
+	scrollEvent = false;
+	$('html, body').stop().animate({
+		'scrollTop' : viewportHeight * index
+	}, 500, 'swing', function(){
+		scrollEvent = true;
+	});
+}
+// Event
+var $window = $(window),
+	$tabs = $('nav a'),
+	$sections = $('.section'),
+	viewportHeight = $window.height(),
+	scrollEvent = true;
 
-// 이벤트 발생시(탭 메뉴 클릭 / 페이지 스크롤의 특정 범위에 진입했을 시):
-// 함수1. 탭 활성화(타겟 인덱스)
-// 함수2. 섹션 활성화(타겟 인덱스)
-
-
-document.addEventListener('scroll', function(e){
-
+$tabs.on('click', function(e){
+	e.preventDefault();	
+	var index = getIndex(e.target);
+	activeTab(index);
+	activeSection(index);
 });
 
+$window.on('scroll', function(e){
+	if ( scrollEvent ) {
+		var index = getIndex($window.scrollTop());
+		activeTab(index);
+	}
+});
 </script>
 </body>
 </html>
