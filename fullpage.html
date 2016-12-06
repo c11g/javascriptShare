@@ -2,15 +2,16 @@
 <html lang="ko">
 <head>
 	<meta charset="UTF-8">
-	<title>scroll tab</title>
+	<title>fullpage UI</title>
 	<style>
-		body {margin: 0 }
-		nav {position: fixed; top: 20px; left: 20px }
-		nav a {transition: 2s ease; position: relative; overflow: hidden; display: block; width: 100px; height: 100px; text-align: center }
-		nav a:after {position: absolute; top: 0; right: 0; bottom: 0; left: 0; display: block; background: #fff; opacity: 0.5; content: '' }
-		nav a.is-active {z-index: 1; transform: scale(1.3) }
+		body { overflow: hidden; margin: 0 }
+		nav { z-index: 1; position: fixed; top: 20px; left: 20px }
+		nav a { transition: 2s ease; position: relative; overflow: hidden; display: block; width: 100px; height: 100px; text-align: center }
+		nav a:after { position: absolute; top: 0; right: 0; bottom: 0; left: 0; display: block; background: #fff; opacity: 0.5; content: '' }
+		nav a.is-active { z-index: 1; transform: scale(1.3) }
 		nav a.is-active:after { opacity: 0 }
 		nav img { margin: 0 -50%; height: 100% }
+		#fullpage { transition: 1s ease; transform: translate3d(0, 0, 0); }
 		.section { height: 100vh; background-size: cover }
 		.section-1 { background-image: url('images/background-image-01.jpeg') }
 		.section-2 { background-image: url('images/background-image-02.jpeg') }
@@ -25,7 +26,7 @@
 	<a href="#section-3"><img src="images/background-image-03.jpeg" alt="3번 섹션 이동"></a>
 	<a href="#section-4"><img src="images/background-image-04.jpeg" alt="4번 섹션 이동"></a>
 </nav>
-<main>
+<main id="fullpage">
 	<section class="section section-1"></section>
 	<section class="section section-2"></section>
 	<section class="section section-3"></section>
@@ -35,12 +36,17 @@
 <script src="libs/jquery-3.1.1.min.js"></script>
 <script>
 'use strict';
-function getIndex(target){
-	var _index;
-	_index = ( target.nodeType === 1 )
-			? $(target).index()
-			: Math.round($window.scrollTop() / viewportHeight);
-	return _index;
+function getCurrentIndex(target){
+	if ( target.nodeType === 1 ) {
+		currentIndex = $(target).index();
+	} else {
+		if ( target.deltaY > 0 && currentIndex < $tabs.length-1 ) {
+			currentIndex++;
+		} else if ( target.deltaY < 0 && currentIndex > 0 ) {
+			currentIndex--;
+		}
+	}
+	return currentIndex;
 }
 function activeTab(index){
 	var isActive = $tabs.eq(index).hasClass('is-active');
@@ -49,31 +55,33 @@ function activeTab(index){
 	}
 }
 function activeSection(index){
-	scrollEvent = false;
-	$('html, body').stop().animate({
-		'scrollTop' : viewportHeight * index
-	}, 500, 'swing', function(){
-		scrollEvent = true;
-	});
+	$('#fullpage').attr('style', 'transform: translate3d(0, ' + -viewportHeight*index + 'px, 0)');
 }
 // Event
 var $window = $(window),
 	$tabs = $('nav a'),
 	$sections = $('.section'),
 	viewportHeight = $window.height(),
-	scrollEvent = true;
+	wheelEvent = true,
+	currentIndex = 0;
 
 $tabs.on('click', function(e){
-	e.preventDefault();	
-	var index = getIndex(e.target);
-	activeTab(index);
-	activeSection(index);
+	e.preventDefault();
+	currentIndex = getCurrentIndex(e.target);
+	activeTab(currentIndex);
+	activeSection(currentIndex);
 });
 
-$window.on('scroll', function(e){
-	if ( scrollEvent ) {
-		var index = getIndex($window.scrollTop());
-		activeTab(index);
+document.body.addEventListener('wheel', function(e){
+	e.preventDefault();
+	if ( wheelEvent ) {
+		wheelEvent = false;
+		currentIndex = getCurrentIndex(e);
+		activeTab(currentIndex);
+		activeSection(currentIndex);
+		setTimeout(function(){
+			wheelEvent = true;
+		}, 250);
 	}
 });
 </script>
