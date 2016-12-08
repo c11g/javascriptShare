@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+	<meta charset="UTF-8">
+	<title>Single Page Application</title>
+	<style>
+		body { margin: 0 }
+		.nav { z-index: 1; position: fixed; top: 20px; left: 20px }
+		.nav a { transition: 2s ease; position: relative; overflow: hidden; display: block; width: 100px; height: 100px; text-align: center }
+		.nav a:after { position: absolute; top: 0; right: 0; bottom: 0; left: 0; display: block; background: #fff; opacity: 0.5; content: '' }
+		.nav a.is-active { z-index: 1; transform: scale(1.3) }
+		.nav a.is-active:after { opacity: 0 }
+		.nav img { margin: 0 -50%; height: 100% }
+		.section { height: 100vh; background-size: cover }
+		.section-1 { background-image: url('images/background-image-01.jpeg') }
+		.section-2 { background-image: url('images/background-image-02.jpeg') }
+		.section-3 { background-image: url('images/background-image-03.jpeg') }
+		.section-4 { background-image: url('images/background-image-04.jpeg') }
+		
+		.fullpage { overflow: hidden }
+		.fullpage .sections-wrap { transition: 1s ease; transform: translate3d(0, 0, 0) }
+	</style>
+</head>
+<body>
+<nav class="nav">
+	<a href="#section-1" class="is-active"><img src="images/background-image-01.jpeg" alt="1번 섹션 이동"></a>
+	<a href="#section-2"><img src="images/background-image-02.jpeg" alt="2번 섹션 이동"></a>
+	<a href="#section-3"><img src="images/background-image-03.jpeg" alt="3번 섹션 이동"></a>
+	<a href="#section-4"><img src="images/background-image-04.jpeg" alt="4번 섹션 이동"></a>
+</nav>
+<main class="sections-wrap">
+	<section class="section section-1"></section>
+	<section class="section section-2"></section>
+	<section class="section section-3"></section>
+	<section class="section section-4"></section>
+</main>
+
+<script src="libs/jquery-3.1.1.min.js"></script>
+<script>
+(function(){
+	'use strict';
+	function Spa(options){
+		this.$window = $(window);
+		this.viewportHeight = $(window).height();
+		this.stopEvent = false;
+		
+		// option
+		this.spaType = options.spaType || 'scroll'; 
+		this.$tab = $(options.navSelector + ' > a') || '$(".nav > a")';
+		this.$section = $(options.sectionSelector) || '$(".sections-wrap")';
+		this.currentIndex = options.currentIndex || 0;
+
+		// 초기실행
+		this.init();
+	}
+
+	Spa.prototype = {
+		init : function(){
+			if ( this.spaType === 'fullpage' ) {
+				$('body').addClass('fullpage');
+			}
+			this.events();
+			this.activeTab(this.currentIndex);
+			this.activeSection(this.currentIndex);
+		},
+		getIndex : function(it){
+			var _index;
+			_index = ( it.nodeType === 1 )
+					? $(it).index()
+					: Math.round(this.$window.scrollTop() / this.viewportHeight);
+			return _index;
+		},
+		activeTab : function(index){
+			var isActive = this.$tab.eq(index).hasClass('is-active');
+			if ( !isActive ) {
+				this.$tab.eq(index).addClass('is-active').siblings().removeClass('is-active');
+			}
+		},
+		activeSection : function(index){
+			var that = this;
+			if ( this.spaType === 'fullpage' ) {
+				$sections.attr('style', 'transform: translate3d(0, ' + -viewportHeight*index + 'px, 0)');
+				return;
+			}
+			if ( this.spaType === 'scroll' ) {
+				that.stopEvent = true;
+				$('html, body').stop().animate({
+					'scrollTop' : this.viewportHeight * index
+				}, 500, 'swing', function(){
+					that.stopEvent = false;
+				});
+				return;
+			}
+		},
+		events : function(){
+			var that = this;
+			this.$tab.on('click', function(event){
+				event.preventDefault();
+				that.currentIndex = that.getIndex(event.target);
+				that.activeTab(that.currentIndex);
+				that.activeSection(that.currentIndex);
+			});
+			if ( this.spaType === 'fullpage' ) {
+				console.log(this.spaType);
+				return;
+			}
+			if ( this.spaType === 'scroll') {
+				this.$window.on('scroll', function(event){
+					if ( !that.stopEvent ) {
+						var scrollValue = that.$window.scrollTop();
+						that.currentIndex = that.getIndex(scrollValue);
+						that.activeTab(that.currentIndex);
+					}
+				});
+				return;
+			}
+		}
+	};
+
+	var mySpa = new Spa({
+		spaType: 'scroll',
+		navSelector: '.nav',
+		sectionSelector: '.section',
+		currentIndex: 0
+	});
+})();
+</script>
+</body>
+</html>

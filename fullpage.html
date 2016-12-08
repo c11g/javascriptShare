@@ -62,7 +62,7 @@ var $window = $(window),
 	$tabs = $('nav a'),
 	$sections = $('.section'),
 	viewportHeight = $window.height(),
-	wheelEvent = true,
+	wheeling = false,
 	currentIndex = 0;
 
 $tabs.on('click', function(e){
@@ -74,14 +74,14 @@ $tabs.on('click', function(e){
 
 document.body.addEventListener('wheel', function(e){
 	e.preventDefault();
-	if ( wheelEvent ) {
-		wheelEvent = false;
+	if ( !wheeling ) {
+		wheeling = true;
 		currentIndex = getCurrentIndex(e);
 		activeTab(currentIndex);
 		activeSection(currentIndex);
 		setTimeout(function(){
-			wheelEvent = true;
-		}, 250);
+			wheeling = false;
+		}, 1250);
 	}
 });
 </script>
