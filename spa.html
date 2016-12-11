@@ -47,7 +47,7 @@
 		// option
 		this.spaType = options.spaType || 'scroll'; 
 		this.$tab = $(options.navSelector + ' > a') || '$(".nav > a")';
-		this.$section = $(options.sectionSelector) || '$(".sections-wrap")';
+		this.$sections = $(options.sectionSelector) || '$(".sections-wrap")';
 		this.currentIndex = options.currentIndex || 0;
 
 		// 초기실행
@@ -59,16 +59,23 @@
 			if ( this.spaType === 'fullpage' ) {
 				$('body').addClass('fullpage');
 			}
-			this.events();
+			this.addEvents();
 			this.activeTab(this.currentIndex);
-			this.activeSection(this.currentIndex);
+
 		},
-		getIndex : function(it){
-			var _index;
-			_index = ( it.nodeType === 1 )
-					? $(it).index()
-					: Math.round(this.$window.scrollTop() / this.viewportHeight);
-			return _index;
+		getIndexByClick : function(target) {
+			return $(target).index();
+		},
+		getIndexByScroll : function(){
+			return Math.round(this.$window.scrollTop() / this.viewportHeight);;
+		},
+		getIndexByWheel : function(event){
+			if ( event.originalEvent.deltaY > 0 && this.currentIndex < this.$tab.length-1 ) {
+				this.currentIndex++;
+			} else if ( event.originalEvent.deltaY < 0 && this.currentIndex > 0 ) {
+				this.currentIndex--;
+			}
+			return this.currentIndex;
 		},
 		activeTab : function(index){
 			var isActive = this.$tab.eq(index).hasClass('is-active');
@@ -76,51 +83,60 @@
 				this.$tab.eq(index).addClass('is-active').siblings().removeClass('is-active');
 			}
 		},
-		activeSection : function(index){
-			var that = this;
-			if ( this.spaType === 'fullpage' ) {
-				$sections.attr('style', 'transform: translate3d(0, ' + -viewportHeight*index + 'px, 0)');
+		transformSection : function(index){
+			this.$sections.attr('style', 'transform: translate3d(0, ' + -this.viewportHeight * index + 'px, 0)');
+		},
+		scrollSection : function(index){
+			this.stopEvent = true;
+			$('html, body').stop().animate({
+				'scrollTop' : this.viewportHeight * index
+			}, 500, 'swing', function(){
+				this.stopEvent = false;
+			});
+		},
+		tabEvent : function(event) {
+			event.preventDefault();
+			if ( this.currentIndex === this.getIndexByClick(event.target) ) {
 				return;
 			}
-			if ( this.spaType === 'scroll' ) {
-				that.stopEvent = true;
-				$('html, body').stop().animate({
-					'scrollTop' : this.viewportHeight * index
-				}, 500, 'swing', function(){
-					that.stopEvent = false;
-				});
-				return;
+			this.currentIndex = this.getIndexByClick(event.target);
+			this.activeTab(this.currentIndex);
+			if ( this.spaType === 'fullpage' ) {
+				this.transformSection(this.currentIndex);
+			} else {
+				this.scrollSection(this.currentIndex);
 			}
 		},
-		events : function(){
-			var that = this;
-			this.$tab.on('click', function(event){
-				event.preventDefault();
-				that.currentIndex = that.getIndex(event.target);
-				that.activeTab(that.currentIndex);
-				that.activeSection(that.currentIndex);
-			});
-			if ( this.spaType === 'fullpage' ) {
-				console.log(this.spaType);
-				return;
+		scrollEvent : function(event) {
+			if ( !this.stopEvent ) {
+				var scrollValue = this.$window.scrollTop();
+				this.currentIndex = this.getIndexByScroll();
+				this.activeTab(this.currentIndex);
 			}
-			if ( this.spaType === 'scroll') {
-				this.$window.on('scroll', function(event){
-					if ( !that.stopEvent ) {
-						var scrollValue = that.$window.scrollTop();
-						that.currentIndex = that.getIndex(scrollValue);
-						that.activeTab(that.currentIndex);
-					}
-				});
-				return;
+		},
+		wheelEvent : function(event) {
+			if ( !this.stopEvent ) {
+				this.stopEvent = true;
+				this.currentIndex = this.getIndexByWheel(event);
+				this.activeTab(this.currentIndex);
+				this.transformSection(this.currentIndex);
+				
+				var _self = this;
+				setTimeout(function(){
+					_self.stopEvent = false;
+				}, 1250);
 			}
+		},
+		addEvents : function(){
+			this.$tab.on('click', this.tabEvent.bind(this));
+			this.$window.on('wheel', this.wheelEvent.bind(this));
 		}
 	};
 
 	var mySpa = new Spa({
-		spaType: 'scroll',
+		spaType: 'fullpage',
 		navSelector: '.nav',
-		sectionSelector: '.section',
+		sectionSelector: '.sections-wrap',
 		currentIndex: 0
 	});
 })();
