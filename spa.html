@@ -18,8 +18,10 @@
 		.section-4 { background-image: url('images/background-image-04.jpeg') }
 		
 		.fullpage { overflow: hidden }
-		.fullpage .sections-wrap { transition: 1s ease; transform: translate3d(0, 0, 0) }
+		.fullpage .sections-wrap { transition: 1.2s ease; transform: translate3d(0, 0, 0) }
 	</style>
+	<script src="libs/jquery-3.1.1.min.js"></script>
+	<script src="libs/jQuery.spa.js"></script>
 </head>
 <body>
 <nav class="nav">
@@ -35,111 +37,12 @@
 	<section class="section section-4"></section>
 </main>
 
-<script src="libs/jquery-3.1.1.min.js"></script>
 <script>
-(function(){
-	'use strict';
-	function Spa(options){
-		this.$window = $(window);
-		this.viewportHeight = $(window).height();
-		this.stopEvent = false;
-		
-		// option
-		this.spaType = options.spaType || 'scroll'; 
-		this.$tab = $(options.navSelector + ' > a') || '$(".nav > a")';
-		this.$sections = $(options.sectionSelector) || '$(".sections-wrap")';
-		this.currentIndex = options.currentIndex || 0;
-
-		// 초기실행
-		this.init();
-	}
-
-	Spa.prototype = {
-		init : function(){
-			if ( this.spaType === 'fullpage' ) {
-				$('body').addClass('fullpage');
-			}
-			this.addEvents();
-			this.activeTab(this.currentIndex);
-
-		},
-		getIndexByClick : function(target) {
-			return $(target).index();
-		},
-		getIndexByScroll : function(){
-			return Math.round(this.$window.scrollTop() / this.viewportHeight);;
-		},
-		getIndexByWheel : function(event){
-			if ( event.originalEvent.deltaY > 0 && this.currentIndex < this.$tab.length-1 ) {
-				this.currentIndex++;
-			} else if ( event.originalEvent.deltaY < 0 && this.currentIndex > 0 ) {
-				this.currentIndex--;
-			}
-			return this.currentIndex;
-		},
-		activeTab : function(index){
-			var isActive = this.$tab.eq(index).hasClass('is-active');
-			if ( !isActive ) {
-				this.$tab.eq(index).addClass('is-active').siblings().removeClass('is-active');
-			}
-		},
-		transformSection : function(index){
-			this.$sections.attr('style', 'transform: translate3d(0, ' + -this.viewportHeight * index + 'px, 0)');
-		},
-		scrollSection : function(index){
-			this.stopEvent = true;
-			$('html, body').stop().animate({
-				'scrollTop' : this.viewportHeight * index
-			}, 500, 'swing', function(){
-				this.stopEvent = false;
-			});
-		},
-		tabEvent : function(event) {
-			event.preventDefault();
-			if ( this.currentIndex === this.getIndexByClick(event.target) ) {
-				return;
-			}
-			this.currentIndex = this.getIndexByClick(event.target);
-			this.activeTab(this.currentIndex);
-			if ( this.spaType === 'fullpage' ) {
-				this.transformSection(this.currentIndex);
-			} else {
-				this.scrollSection(this.currentIndex);
-			}
-		},
-		scrollEvent : function(event) {
-			if ( !this.stopEvent ) {
-				var scrollValue = this.$window.scrollTop();
-				this.currentIndex = this.getIndexByScroll();
-				this.activeTab(this.currentIndex);
-			}
-		},
-		wheelEvent : function(event) {
-			if ( !this.stopEvent ) {
-				this.stopEvent = true;
-				this.currentIndex = this.getIndexByWheel(event);
-				this.activeTab(this.currentIndex);
-				this.transformSection(this.currentIndex);
-				
-				var _self = this;
-				setTimeout(function(){
-					_self.stopEvent = false;
-				}, 1250);
-			}
-		},
-		addEvents : function(){
-			this.$tab.on('click', this.tabEvent.bind(this));
-			this.$window.on('wheel', this.wheelEvent.bind(this));
-		}
-	};
-
-	var mySpa = new Spa({
-		spaType: 'fullpage',
-		navSelector: '.nav',
-		sectionSelector: '.sections-wrap',
-		currentIndex: 0
-	});
-})();
+var mySpa = new Spa({
+	spaType: 'fullpage',
+	navSelector: '.nav > a',
+	sectionSelector: '.sections-wrap'
+});
 </script>
 </body>
 </html>
